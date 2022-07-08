@@ -15,14 +15,14 @@ hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
 clear
 : ${hostname:?"hostname cannot be empty"}
 
-user=$(dialog --stdout --inputbox "Enter admin username" 0 0) || exit 1
+user=$(dialog --stdout --inputbox "Enter admin username" 0 0 "felix_feuerigel") || exit 1
 clear
 : ${user:?"user cannot be empty"}
 
-password=$(dialog --stdout --passwordbox "Enter admin password" 0 0) || exit 1
+password=$(dialog --stdout --insecure --passwordbox "Enter admin password" 0 0) || exit 1
 clear
 : ${password:?"password cannot be empty"}
-password2=$(dialog --stdout --passwordbox "Enter admin password again" 0 0) || exit 1
+password2=$(dialog --stdout --insecure --passwordbox "Enter admin password again" 0 0) || exit 1
 clear
 [[ "$password" == "$password2" ]] || ( echo "Passwords did not match"; exit 1; )
 
