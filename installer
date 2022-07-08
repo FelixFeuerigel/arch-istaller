@@ -94,7 +94,7 @@ arch-chroot /mnt ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime && hwcl
 
 
 # Generieren & Einstellen der Lokalisierungs-Packete
-cat >>/mnt/etc/pacman.conf <<EOF
+cat >>/mnt/etc/locale.gen <<EOF
 en_US.UTF-8 UTF-8
 de_DE.UTF-8 UTF-8
 EOF
