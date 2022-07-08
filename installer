@@ -90,7 +90,7 @@ echo "${hostname}" > /mnt/etc/hostname
 
 
 # Setzen der Zeitzone & Kalibrieren der Hardware-Uhr
-arch-chroot /mnt ln -sf /usr/share/zoneinfo/meine_region/meine_stadt /etc/localtime && hwclock --systohc
+arch-chroot /mnt ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime && hwclock --systohc
 
 
 # Generieren & Einstellen der Lokalisierungs-Packete
