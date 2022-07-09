@@ -47,7 +47,7 @@ exec 2> >(tee "stderr.log")
 timedatectl set-ntp true
 
 ### Setup the disk and partitions for GPT/UEFI###
-if [ "$boot_mode" == "EFI"]
+if [ "$boot_mode" == "EFI" ]
   then
     swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
     swap_end=$(( $swap_size + 300 + 1 ))MiB
@@ -78,7 +78,7 @@ if [ "$boot_mode" == "EFI"]
 fi
 
 ### Setup the disk and partitions for MBR/BIOS###
-if [ "$boot_mode" == "BIOS"]
+if [ "$boot_mode" == "BIOS" ]
   then
     swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
     swap_end=$(( $swap_size + 1 ))MiB
@@ -140,7 +140,7 @@ echo "LANG=en_US.UTF-8" >> /mnt/etc/locale.conf
 echo "KEYMAP=de-latin1" >> /mnt/etc/vconsole.conf
 
 ### installing the boot loader for GPT/UEFI ###
-if [ "$boot_mode" == "EFI"]
+if [ "$boot_mode" == "EFI" ]
 then
 arch-chroot /mnt bootctl --path=/boot install
 
@@ -157,7 +157,7 @@ options  root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
 EOF
 fi
 
-if [ "$boot_mode" == "BIOS"]
+if [ "$boot_mode" == "BIOS" ]
   then
     pacstrap /mnt grub
     arch-chroot /mnt grub-install --target=i386-pc "${device}"
