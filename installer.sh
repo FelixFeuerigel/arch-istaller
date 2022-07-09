@@ -1,7 +1,7 @@
 #!/bin/bash
 # WARNING: this script will destroy data on the selected disk.
 # This script can be run by executing the following:
-### curl -sL https://bit.ly/3yvB21X | bash
+### curl -sL https://bit.ly/3yvB21X | bash ###
 
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -35,10 +35,11 @@ clear
 exec 1> >(tee "stdout.log")
 exec 2> >(tee "stderr.log")
 
+
 timedatectl set-ntp true
 
 
-### Setup the disk and partitions ###
+### Setup the disk and partitions for GPT/UEFI###
 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
 swap_end=$(( $swap_size + 129 + 1 ))MiB
 
@@ -93,7 +94,7 @@ echo "${hostname}" > /mnt/etc/hostname
 arch-chroot /mnt ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime && hwclock --systohc
 
 
-# Generieren & Einstellen der Lokalisierungs-Packete
+# generating & setting the locale
 cat >>/mnt/etc/locale.gen <<EOF
 en_US.UTF-8 UTF-8
 de_DE.UTF-8 UTF-8
@@ -104,8 +105,8 @@ echo "LANG=en_US.UTF-8" >> /mnt/etc/locale.conf
 echo "KEYMAP=de-latin1" >> /mnt/etc/vconsole.conf
 
 
-# Installieren des Bootloaders
-arch-chroot /mnt bootctl install
+# installing the boot loader
+arch-chroot /mnt bootctl --path=/boot install
 
 cat <<EOF > /mnt/boot/loader/loader.conf
 default arch
@@ -119,7 +120,7 @@ initrd   /initramfs-linux.img
 options  root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
 EOF
 
-### Hinzufügen der Benutzer ###
+### adding the user ###
 arch-chroot /mnt useradd -mG wheel "$user"
 
 echo "$user:$password" | chpasswd --root /mnt
