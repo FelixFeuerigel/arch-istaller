@@ -2,7 +2,7 @@
 # WARNING: this script will destroy data on the selected disk.
 # This script can be run by executing the following:
 ### curl -sL https://tinyurl.com/24tht5j5 | bash ###
-## if you need to use WiFi use "iwctl" for setup
+## if you need to use WiFi use "iwctl" for setup  ##
 
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
