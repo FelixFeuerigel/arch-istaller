@@ -110,7 +110,7 @@ fi
 # EOF
 
 # pacstrap /mnt mdaffin-desktop
-pacstrap /mnt base base-devel linux linux-firmware intel-ucode nano sudo networkmanager git
+pacstrap /mnt base base-devel linux linux-firmware intel-ucode amd-ucode nano sudo networkmanager git alsa-ucm-conf sof-firmware alsa-ucm-conf
 genfstab -U /mnt >> /mnt/etc/fstab
 
 
