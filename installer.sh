@@ -126,8 +126,8 @@ echo "${hostname}" > /mnt/etc/hostname
 
 
 # Setzen der Zeitzone & Kalibrieren der Hardware-Uhr
-arch-chroot /mnt ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime && hwclock --systohc
-
+arch-chroot /mnt ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+arch-chroot /mnt hwclock --systohc
 
 # generating & setting the locale
 cat >>/mnt/etc/locale.gen <<EOF
