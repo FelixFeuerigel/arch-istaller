@@ -9,6 +9,8 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
 # REPO_URL="https://s3.eu-west-2.amazonaws.com/mdaffin-arch/repo/x86_64"
 
+timedatectl set-ntp true
+
 pacman -Syq dialog --noconfirm
 
 ### Get infomation from user ###
@@ -31,6 +33,10 @@ devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
 device=$(dialog --stdout --menu "Select installtion disk" 0 0 0 ${devicelist}) || exit 1
 clear
 
+### Set up logging ###
+exec 1> >(tee "stdout.log")
+exec 2> >(tee "stderr.log")
+
 ### Check boot mode
 if [ -d /sys/firmware/efi/efivars ]
   then
@@ -38,13 +44,6 @@ if [ -d /sys/firmware/efi/efivars ]
   else
     boot_mode="BIOS"
 fi
-
-### Set up logging ###
-exec 1> >(tee "stdout.log")
-exec 2> >(tee "stderr.log")
-
-
-timedatectl set-ntp true
 
 ### Setup the disk and partitions for GPT/UEFI###
 if [ "$boot_mode" == "EFI" ]
