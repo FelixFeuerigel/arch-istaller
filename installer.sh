@@ -4,14 +4,15 @@
 ### curl -sL https://bit.ly/3aSie4S | bash ###
 ## if you need to use WiFi use "iwctl" for setup  ##
 
+# REPO_URL="https://s3.eu-west-2.amazonaws.com/mdaffin-arch/repo/x86_64"
+
+
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
-# REPO_URL="https://s3.eu-west-2.amazonaws.com/mdaffin-arch/repo/x86_64"
-
 timedatectl set-ntp true
-
 pacman -Syq dialog --noconfirm
+
 
 ### Get infomation from user ###
 hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
@@ -33,11 +34,13 @@ devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
 device=$(dialog --stdout --menu "Select installtion disk" 0 0 0 ${devicelist}) || exit 1
 clear
 
+
 ### Set up logging ###
 exec 1> >(tee "stdout.log")
 exec 2> >(tee "stderr.log")
 
-### Check boot mode
+
+### Check boot mode ###
 if [ -d /sys/firmware/efi/efivars ]
   then
     boot_mode="EFI"
@@ -45,7 +48,8 @@ if [ -d /sys/firmware/efi/efivars ]
     boot_mode="BIOS"
 fi
 
-### Setup the disk and partitions for GPT/UEFI###
+
+### Setup the disk and partitions for GPT/UEFI ###
 if [ "$boot_mode" == "EFI" ]
   then
     swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
@@ -76,7 +80,8 @@ if [ "$boot_mode" == "EFI" ]
     mount --mkdir "${part_boot}" /mnt/boot
 fi
 
-### Setup the disk and partitions for MBR/BIOS###
+
+### Setup the disk and partitions for MBR/BIOS ###
 if [ "$boot_mode" == "BIOS" ]
   then
     swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
@@ -113,10 +118,6 @@ fi
 pacstrap /mnt base base-devel linux linux-firmware intel-ucode amd-ucode nano sudo networkmanager git alsa-ucm-conf sof-firmware alsa-ucm-conf
 genfstab -U /mnt >> /mnt/etc/fstab
 
-
-echo "${hostname}" > /mnt/etc/hostname
-
-
 # cat >>/mnt/etc/pacman.conf <<EOF
 # [mdaffin]
 # SigLevel = Optional TrustAll
@@ -124,11 +125,28 @@ echo "${hostname}" > /mnt/etc/hostname
 # EOF
 
 
-# Setzen der Zeitzone & Kalibrieren der Hardware-Uhr
+### network setup ###
+echo "${hostname}" > /mnt/etc/hostname
+
+cat >>/mnt/etc/hosts <<EOF
+# The following lines are desirable for IPv4 capable hosts
+127.0.0.1       localhost
+127.0.1.1       $hostname
+# The following lines are desirable for IPv6 capable hosts
+::1             localhost ip6-localhost ip6-loopback
+ff02::1         ip6-allnodes
+ff02::2         ip6-allrouters
+EOF
+
+arch-chroot /mnt systemctl enable NetworkManager
+
+
+### seting the timezone and calibrating the hardware clock ###
 arch-chroot /mnt ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 arch-chroot /mnt hwclock --systohc
 
-# generating & setting the locale
+
+### generating & setting the locale ###
 cat >>/mnt/etc/locale.gen <<EOF
 en_US.UTF-8 UTF-8
 de_DE.UTF-8 UTF-8
@@ -137,6 +155,7 @@ EOF
 arch-chroot /mnt locale-gen
 echo "LANG=en_US.UTF-8" >> /mnt/etc/locale.conf
 echo "KEYMAP=de-latin1" >> /mnt/etc/vconsole.conf
+
 
 ### installing the boot loader for GPT/UEFI ###
 if [ "$boot_mode" == "EFI" ]
@@ -156,6 +175,8 @@ options  root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
 EOF
 fi
 
+
+### installing GRUB for BIOS/MBR systems ###
 if [ "$boot_mode" == "BIOS" ]
   then
     pacstrap /mnt grub
@@ -163,11 +184,13 @@ if [ "$boot_mode" == "BIOS" ]
     arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 fi
 
+
 ### adding the user ###
 arch-chroot /mnt useradd -mG wheel "$user"
 
 echo "$user:$password" | chpasswd --root /mnt
 echo "root:$password" | chpasswd --root /mnt
+
 
 ## enableing sudo for the wheel group
 sed -i "s/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/ %wheel ALL=(ALL:ALL) NOPASSWD: ALL/" /mnt/etc/sudoers
