@@ -11,7 +11,7 @@ set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
 timedatectl set-ntp true
-pacman -Syq dialog --noconfirm
+pacman -Syq dialog --noconfirm --needed
 
 
 ### Get infomation from user ###
