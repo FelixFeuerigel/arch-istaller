@@ -1,8 +1,12 @@
 #!/bin/bash
 # WARNING: this script will destroy data on the selected disk.
+# NOTICE: The script is curently only installing the u-code for intel CPUs.
+#
 # This script can be run by executing the following:
-### curl -sL https://bit.ly/3aSie4S | bash ###
-## if you need to use WiFi use "iwctl" for setup  ##
+# ### curl -sL https://bit.ly/3aSie4S | bash ###
+#
+# ## if you need to use WiFi use "iwctl" for setup  ##
+#
 
 # REPO_URL="https://s3.eu-west-2.amazonaws.com/mdaffin-arch/repo/x86_64"
 
@@ -11,6 +15,7 @@ set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
 timedatectl set-ntp true
+sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 pacman -Syq dialog --noconfirm --needed
 
 
@@ -115,14 +120,22 @@ fi
 # EOF
 
 # pacstrap /mnt mdaffin-desktop
-pacstrap /mnt base base-devel linux linux-firmware intel-ucode amd-ucode nano sudo networkmanager git alsa-ucm-conf sof-firmware alsa-ucm-conf
+pacstrap /mnt base base-devel linux linux-firmware intel-ucode nano sudo networkmanager git alsa-ucm-conf sof-firmware alsa-ucm-conf
 genfstab -U /mnt >> /mnt/etc/fstab
 
+### Edit the pacman.conf ###
+### add own repo
 # cat >>/mnt/etc/pacman.conf <<EOF
 # [mdaffin]
 # SigLevel = Optional TrustAll
 # Server = $REPO_URL
 # EOF
+
+### enable parallel downloads
+sed -i 's/^#ParallelDownloads/ParallelDownloads/' /mnt/etc/pacman.conf
+
+### enable multilib
+sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
 
 
 ### network setup ###
