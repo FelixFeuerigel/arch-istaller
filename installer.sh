@@ -54,7 +54,7 @@ if [ -d /sys/firmware/efi/efivars ]
 fi
 
 # make sure everything is unmounted before we start
-if [ -n "$(ls -a /mnt)"] # if folder is empty
+if [ -n "$(ls -a /mnt)" ] # if folder is empty
   then
     umount -AR /mnt
 fi
