@@ -19,8 +19,9 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 exec 1> >(tee "stdout.log")
 exec 2> >(tee "stderr.log")
 
-### ####
+### basic pre-install setup ###
 timedatectl set-ntp true
+loadkeys de-latin1
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 pacman -Syq dialog archlinux-keyring --noconfirm --needed
 
