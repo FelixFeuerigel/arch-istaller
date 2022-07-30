@@ -135,10 +135,6 @@ sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 # pacstrap /mnt mdaffin-desktop
 pacstrap /mnt base base-devel linux linux-firmware intel-ucode nano sudo networkmanager git alsa-ucm-conf sof-firmware alsa-ucm-conf
 
-### Install Desktop
-pacstrap /mnt xf86-video-vmware mesa lib32-mesa lightdm lightdm-gtk-greeter plasma-meta kde-applications-meta
-arch-chroot /mnt systemctl enable lightdm
-
 genfstab -U /mnt >> /mnt/etc/fstab
 
 ### Edit the pacman.conf ###
@@ -225,3 +221,8 @@ echo "root:$password" | chpasswd --root /mnt
 
 ## enableing sudo for the wheel group
 sed -i "s/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/ %wheel ALL=(ALL:ALL) NOPASSWD: ALL/" /mnt/etc/sudoers
+
+
+### Install Desktop
+pacstrap /mnt xf86-video-vmware mesa lib32-mesa lightdm lightdm-gtk-greeter plasma-meta kde-applications-meta
+arch-chroot /mnt systemctl enable lightdm
