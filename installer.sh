@@ -8,7 +8,8 @@
 # ## if you need to use WiFi use "iwctl" for setup  ##
 #
 
-# REPO_URL="https://s3.eu-west-2.amazonaws.com/mdaffin-arch/repo/x86_64"
+### Custom Arch Repository ###
+REPO_URL="https://s3.eu-west-2.amazonaws.com/mdaffin-arch/repo/x86_64"
 
 
 set -uo pipefail
@@ -16,7 +17,7 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
 timedatectl set-ntp true
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
-pacman -Syq dialog --noconfirm --needed
+pacman -Syq dialog archlinux-keyring --noconfirm --needed
 
 
 ### Get infomation from user ###
@@ -45,18 +46,22 @@ exec 1> >(tee "stdout.log")
 exec 2> >(tee "stderr.log")
 
 
+### make sure everything is unmounted before we start
+if [ -n "$(ls -A /mnt)" ] # if folder is empty
+  then
+    umount -AR /mnt
+fi
+
+### remove GPT/MBR
+sgdisk -Z "${device}" 
+
+
 ### Check boot mode ###
 if [ -d /sys/firmware/efi/efivars ]
   then
     boot_mode="EFI"
   else
     boot_mode="BIOS"
-fi
-
-# make sure everything is unmounted before we start
-if [ -n "$(ls -A /mnt)" ] # if folder is empty
-  then
-    umount -AR /mnt
 fi
 
 ### Setup the disk and partitions for GPT/UEFI ###
