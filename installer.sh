@@ -224,5 +224,5 @@ sed -i "s/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/ %wheel ALL=(ALL:ALL) NOPASSWD: A
 
 
 ### Install Desktop
-pacstrap /mnt xf86-video-vmware mesa lib32-mesa lightdm lightdm-gtk-greeter plasma-meta kde-applications-meta
-arch-chroot /mnt systemctl enable lightdm
+pacstrap /mnt xf86-video-vmware mesa lib32-mesa sddm sddm-kcm plasma-meta kde-applications-meta
+arch-chroot /mnt systemctl enable sddm.service
