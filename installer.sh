@@ -53,6 +53,8 @@ if [ -d /sys/firmware/efi/efivars ]
     boot_mode="BIOS"
 fi
 
+# make sure everything is unmounted before we start
+umount -A --recursive /mnt
 
 ### Setup the disk and partitions for GPT/UEFI ###
 if [ "$boot_mode" == "EFI" ]
