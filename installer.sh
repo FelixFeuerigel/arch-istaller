@@ -112,29 +112,36 @@ if [ "$boot_mode" == "BIOS" ]
     mount "${part_root}" /mnt
 fi
 
-### Install and configure the basic system ###
+### Add custom repo
 # cat >>/etc/pacman.conf <<EOF
 # [mdaffin]
 # SigLevel = Optional TrustAll
 # Server = $REPO_URL
 # EOF
 
+##### Start of Config for New System #####
+#### Install and configure the basic system ####
 # pacstrap /mnt mdaffin-desktop
 pacstrap /mnt base base-devel linux linux-firmware intel-ucode nano sudo networkmanager git alsa-ucm-conf sof-firmware alsa-ucm-conf
+
+### Install Desktop
+pacstrap /mnt xf86-video-vmware mesa lib32-mesa lightdm lightdm-gtk-greeter plasma-meta kde-applications-meta
+arch-chroot /mnt systemctl enable lightdm
+
 genfstab -U /mnt >> /mnt/etc/fstab
 
 ### Edit the pacman.conf ###
-### add own repo
+## add own repo
 # cat >>/mnt/etc/pacman.conf <<EOF
 # [mdaffin]
 # SigLevel = Optional TrustAll
 # Server = $REPO_URL
 # EOF
 
-### enable parallel downloads
+## enable parallel downloads
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /mnt/etc/pacman.conf
 
-### enable multilib
+## enable multilib
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
 
 
