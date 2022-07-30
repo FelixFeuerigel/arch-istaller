@@ -120,12 +120,15 @@ if [ "$boot_mode" == "BIOS" ]
     mount "${part_root}" /mnt
 fi
 
-### Add custom repo
+### Add custom repo ###
 # cat >>/etc/pacman.conf <<EOF
 # [mdaffin]
 # SigLevel = Optional TrustAll
 # Server = $REPO_URL
 # EOF
+
+### enable multilib repo ###
+sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 
 ##### Start of Config for New System #####
 #### Install and configure the basic system ####
