@@ -54,8 +54,10 @@ if [ -d /sys/firmware/efi/efivars ]
 fi
 
 # make sure everything is unmounted before we start
-umount -ARq /mnt
-
+if [ -n "$(ls -a /mnt)"] # if folder is empty
+  then
+    umount -AR /mnt
+fi
 ### Setup the disk and partitions for GPT/UEFI ###
 if [ "$boot_mode" == "EFI" ]
   then
