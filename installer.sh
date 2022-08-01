@@ -169,6 +169,7 @@ arch-chroot /mnt systemctl enable NetworkManager
 
 
 ### seting the timezone and calibrating the hardware clock ###
+arch-chroot /mnt timedatectl set-ntp true
 arch-chroot /mnt ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 arch-chroot /mnt hwclock --systohc
 
