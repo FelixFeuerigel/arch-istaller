@@ -179,10 +179,25 @@ cat >>/mnt/etc/locale.gen <<EOF
 en_US.UTF-8 UTF-8
 de_DE.UTF-8 UTF-8
 EOF
-
 arch-chroot /mnt locale-gen
-echo "LANG=de_DE.UTF-8" >> /mnt/etc/locale.conf
-echo "KEYMAP=de-latin1" >> /mnt/etc/vconsole.conf
+
+cat >>/mnt/etc/locale.conf <<EOF
+LANG=de_DE.UTF-8
+LC_CTYPE="de_DE.UTF-8"
+LC_NUMERIC="de_DE.UTF-8"
+LC_TIME="de_DE.UTF-8"
+LC_COLLATE="de_DE.UTF-8"
+LC_MONETARY="de_DE.UTF-8"
+LC_MESSAGES="de_DE.UTF-8"
+LC_PAPER="de_DE.UTF-8"
+LC_NAME="de_DE.UTF-8"
+LC_ADDRESS="de_DE.UTF-8"
+LC_TELEPHONE="de_DE.UTF-8"
+LC_MEASUREMENT="de_DE.UTF-8"
+LC_IDENTIFICATION="de_DE.UTF-8"
+EOF
+
+arch-chroot /mnt localectl set-keymap de-latin1
 
 
 ### installing the boot loader for GPT/UEFI ###
