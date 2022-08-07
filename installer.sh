@@ -121,7 +121,7 @@ if [ "$boot_mode" == "BIOS" ]
 fi
 
 ### Add custom repo ###
-# cat >>/etc/pacman.conf <<EOF
+# cat >> /etc/pacman.conf << EOF
 # [mdaffin]
 # SigLevel = Optional TrustAll
 # Server = $REPO_URL
@@ -129,6 +129,8 @@ fi
 
 ### enable multilib repo ###
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+
+##-------------------------------------------------##
 
 ##### Start of Config for New System #####
 #### Install and configure the basic system ####
@@ -139,23 +141,23 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 ### Edit the pacman.conf ###
 ## add own repo
-# cat >>/mnt/etc/pacman.conf <<EOF
+# cat >> /mnt/etc/pacman.conf << EOF
 # [mdaffin]
 # SigLevel = Optional TrustAll
 # Server = $REPO_URL
 # EOF
 
-## enable parallel downloads
-sed -i 's/^#ParallelDownloads/ParallelDownloads/' /mnt/etc/pacman.conf
-
 ## enable multilib
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
+
+## enable parallel downloads
+sed -i 's/^#ParallelDownloads/ParallelDownloads/' /mnt/etc/pacman.conf
 
 
 ### network setup ###
 echo "${hostname}" > /mnt/etc/hostname
 
-cat >>/mnt/etc/hosts <<EOF
+cat >>/mnt/etc/hosts << EOF
 # The following lines are desirable for IPv4 capable hosts
 127.0.0.1       localhost
 127.0.1.1       $hostname
@@ -175,13 +177,13 @@ arch-chroot /mnt hwclock --systohc
 
 
 ### generating & setting the locale ###
-cat >>/mnt/etc/locale.gen <<EOF
+cat >>/mnt/etc/locale.gen << EOF
 en_US.UTF-8 UTF-8
 de_DE.UTF-8 UTF-8
 EOF
 arch-chroot /mnt locale-gen
 
-cat >>/mnt/etc/locale.conf <<EOF
+cat >>/mnt/etc/locale.conf << EOF
 LANG=de_DE.UTF-8
 LC_CTYPE="de_DE.UTF-8"
 LC_NUMERIC="de_DE.UTF-8"
@@ -196,7 +198,7 @@ LC_TELEPHONE="de_DE.UTF-8"
 LC_MEASUREMENT="de_DE.UTF-8"
 LC_IDENTIFICATION="de_DE.UTF-8"
 EOF
-
+echo "KEYMAP=de-latin1" >> /mnt/etc/vconsole.conf
 arch-chroot /mnt localectl set-keymap de-latin1
 
 
@@ -205,11 +207,11 @@ if [ "$boot_mode" == "EFI" ]
 then
 arch-chroot /mnt bootctl --path=/boot install
 
-cat <<EOF > /mnt/boot/loader/loader.conf
+cat << EOF > /mnt/boot/loader/loader.conf
 default arch
 EOF
 
-cat <<EOF > /mnt/boot/loader/entries/arch.conf
+cat << EOF > /mnt/boot/loader/entries/arch.conf
 title    Arch Linux
 linux    /vmlinuz-linux
 initrd   /intel-ucode.img
@@ -229,7 +231,7 @@ fi
 
 
 ### adding the user ###
-arch-chroot /mnt useradd -mG wheel "$user"
+arch-chroot /mnt useradd -m -G wheel "$user"
 
 echo "$user:$password" | chpasswd --root /mnt
 echo "root:$password" | chpasswd --root /mnt
