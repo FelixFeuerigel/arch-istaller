@@ -180,6 +180,8 @@ arch-chroot /mnt hwclock --systohc
 cat >>/mnt/etc/locale.gen << EOF
 en_US.UTF-8 UTF-8
 de_DE.UTF-8 UTF-8
+de_DE ISO-8859-1
+de_DE@euro ISO-8859-15
 EOF
 arch-chroot /mnt locale-gen
 
