@@ -11,6 +11,7 @@
 ### Custom Arch Repository ###
 REPO_URL="https://s3.eu-west-2.amazonaws.com/mdaffin-arch/repo/x86_64"
 
+MIRRORLIST_URL="https://archlinux.org/mirrorlist/?country=all&protocol=https&use_mirror_status=on"
 
 ### Set up logging and error handling ###
 set -uo pipefail
@@ -23,11 +24,17 @@ exec 2> >(tee "stderr.log")
 timedatectl set-ntp true
 loadkeys de-latin1
 
-pacman -Syq archlinux-keyring dialog --noconfirm
+pacman -Syy
+pacman -S archlinux-keyring --noconfirm
+
+pacman -S reflector --noconfirm
+reflector -a 48 -f 20 -l 30 -n 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 
 
 ### Get infomation from user ###
+pacman -S dialog --noconfirm
+
 hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
 clear
 : ${hostname:?"hostname cannot be empty"}
