@@ -11,7 +11,6 @@
 ### Custom Arch Repository ###
 REPO_URL="https://s3.eu-west-2.amazonaws.com/mdaffin-arch/repo/x86_64"
 
-MIRRORLIST_URL="https://archlinux.org/mirrorlist/?country=all&protocol=https&use_mirror_status=on"
 
 ### Set up logging and error handling ###
 set -uo pipefail
@@ -208,7 +207,6 @@ LC_MEASUREMENT="de_DE.UTF-8"
 LC_IDENTIFICATION="de_DE.UTF-8"
 EOF
 echo "KEYMAP=de-latin1" >> /mnt/etc/vconsole.conf
-arch-chroot /mnt localectl set-keymap de-latin1
 
 
 ### installing the boot loader for GPT/UEFI ###
