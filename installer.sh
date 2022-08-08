@@ -22,8 +22,9 @@ exec 2> >(tee "stderr.log")
 ### basic pre-install setup ###
 timedatectl set-ntp true
 loadkeys de-latin1
+
+pacman -Syq archlinux-keyring dialog --noconfirm
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
-pacman -Syq dialog archlinux-keyring --noconfirm --needed
 
 
 ### Get infomation from user ###
@@ -157,7 +158,7 @@ sed -i 's/^#ParallelDownloads/ParallelDownloads/' /mnt/etc/pacman.conf
 ### network setup ###
 echo "${hostname}" > /mnt/etc/hostname
 
-cat >>/mnt/etc/hosts << EOF
+cat >> /mnt/etc/hosts << EOF
 # The following lines are desirable for IPv4 capable hosts
 127.0.0.1       localhost
 127.0.1.1       $hostname
@@ -177,7 +178,7 @@ arch-chroot /mnt hwclock --systohc
 
 
 ### generating & setting the locale ###
-cat >>/mnt/etc/locale.gen << EOF
+cat >> /mnt/etc/locale.gen << EOF
 en_US.UTF-8 UTF-8
 de_DE.UTF-8 UTF-8
 de_DE ISO-8859-1
@@ -185,7 +186,7 @@ de_DE@euro ISO-8859-15
 EOF
 arch-chroot /mnt locale-gen
 
-cat >>/mnt/etc/locale.conf << EOF
+cat >> /mnt/etc/locale.conf << EOF
 LANG=de_DE.UTF-8
 LC_CTYPE="de_DE.UTF-8"
 LC_NUMERIC="de_DE.UTF-8"
