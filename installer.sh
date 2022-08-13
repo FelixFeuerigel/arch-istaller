@@ -22,7 +22,7 @@ exec 2> >(tee "stderr.log")
 timedatectl set-ntp true
 loadkeys de-latin1
 
-pacman -S archlinux-keyring --noconfirm
+pacman -Sy archlinux-keyring --noconfirm
 pacman -S --noconfirm --needed reflector dialog
 
 reflector -a 48 -f 25 -l 30 -n 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
