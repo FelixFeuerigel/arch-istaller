@@ -22,17 +22,14 @@ exec 2> >(tee "stderr.log")
 timedatectl set-ntp true
 loadkeys de-latin1
 
-pacman -Syy
 pacman -S archlinux-keyring --noconfirm
+pacman -S --noconfirm --needed reflector dialog
 
-pacman -S reflector --noconfirm
 reflector -a 48 -f 25 -l 30 -n 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 
 
 ### Get infomation from user ###
-pacman -S dialog --noconfirm
-
 hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
 clear
 : ${hostname:?"hostname cannot be empty"}
