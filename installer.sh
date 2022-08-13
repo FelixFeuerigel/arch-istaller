@@ -25,9 +25,6 @@ loadkeys de-latin1
 pacman -Sy archlinux-keyring --noconfirm
 pacman -S --noconfirm --needed reflector dialog
 
-reflector -a 48 -f 25 -l 30 -n 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
-sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
-
 
 ### Get infomation from user ###
 hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
@@ -48,6 +45,10 @@ clear
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
 device=$(dialog --stdout --menu "Select installtion disk" 0 0 0 ${devicelist}) || exit 1
 clear
+
+### set up pacman ###
+reflector -a 48 -f 25 -l 30 -n 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 
 
 ### make sure everything is unmounted before we start
