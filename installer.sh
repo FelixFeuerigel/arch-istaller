@@ -1,6 +1,5 @@
 #!/bin/bash
 # WARNING: this script will destroy data on the selected disk.
-# NOTICE: The script is curently only installing the u-code for intel CPUs.
 #
 # This script can be run by executing the following:
 # ### curl -sL https://bit.ly/3aSie4S | bash ###
@@ -27,7 +26,7 @@ pacman -Syy
 pacman -S archlinux-keyring --noconfirm
 
 pacman -S reflector --noconfirm
-reflector -a 48 -f 20 -l 30 -n 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+reflector -a 48 -f 25 -l 30 -n 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 
 
@@ -64,13 +63,13 @@ fi
 ### Check boot mode ###
 if [ -d /sys/firmware/efi/efivars ]
   then
-    boot_mode="EFI"
+    BOOT_MODE="EFI"
   else
-    boot_mode="BIOS"
+    BOOT_MODE="BIOS"
 fi
 
 ### Setup the disk and partitions for GPT/UEFI ###
-if [ "$boot_mode" == "EFI" ]
+if [ "$BOOT_MODE" == "EFI" ]
   then
     swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
     swap_end=$(( $swap_size + 300 + 1 ))MiB
@@ -102,7 +101,7 @@ fi
 
 
 ### Setup the disk and partitions for MBR/BIOS ###
-if [ "$boot_mode" == "BIOS" ]
+if [ "$BOOT_MODE" == "BIOS" ]
   then
     swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
     swap_end=$(( $swap_size + 1 ))MiB
@@ -142,7 +141,7 @@ sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 ##### Start of Config for New System #####
 #### Install and configure the basic system ####
 # pacstrap /mnt mdaffin-desktop
-pacstrap /mnt base base-devel linux linux-firmware intel-ucode nano sudo networkmanager git alsa-ucm-conf sof-firmware alsa-ucm-conf
+pacstrap /mnt base base-devel linux linux-firmware nano sudo networkmanager git alsa-ucm-conf sof-firmware alsa-ucm-conf
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
@@ -160,6 +159,8 @@ sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
 ## enable parallel downloads
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /mnt/etc/pacman.conf
 
+## enable pacman colors
+sed -i 's/^#Color/Color/' /mnt/etc/pacman.conf
 
 ### network setup ###
 echo "${hostname}" > /mnt/etc/hostname
@@ -209,8 +210,20 @@ EOF
 echo "KEYMAP=de-latin1" >> /mnt/etc/vconsole.conf
 
 
+### determine processor type and install microcode
+PROC_TYPE=$(lscpu)
+if grep -E "GenuineIntel" <<< ${PROC_TYPE}; then
+    echo "Installing Intel microcode"
+    pacstrap /mnt intel-ucode
+    PROC_UCODE="intel-ucode.img"
+elif grep -E "AuthenticAMD" <<< ${PROC_TYPE}; then
+    echo "Installing AMD microcode"
+    pacstrap /mnt amd-ucode
+    PROC_UCODE="amd-ucode.img"
+fi
+
 ### installing the boot loader for GPT/UEFI ###
-if [ "$boot_mode" == "EFI" ]
+if [ "$BOOT_MODE" == "EFI" ]
 then
 arch-chroot /mnt bootctl --path=/boot install
 
@@ -221,19 +234,32 @@ EOF
 cat << EOF > /mnt/boot/loader/entries/arch.conf
 title    Arch Linux
 linux    /vmlinuz-linux
-initrd   /intel-ucode.img
+initrd   /$PROC_UCODE
 initrd   /initramfs-linux.img
 options  root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
 EOF
 fi
 
-
 ### installing GRUB for BIOS/MBR systems ###
-if [ "$boot_mode" == "BIOS" ]
+if [ "$BOOT_MODE" == "BIOS" ]
   then
     pacstrap /mnt grub
     arch-chroot /mnt grub-install --target=i386-pc "${device}"
     arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+fi
+
+### installting graphics drivers
+gpu_type=$(lspci)
+if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
+    pacstrap /mnt nvidia nvidia-xconfig nvidia-utils lib32-nvidia-utils
+elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
+    pacstrap /mnt xf86-video-amdgpu lib32-mesa
+elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
+    pacstrap /mnt libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
+elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
+    pacstrap /mnt libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
+elif grep -E "VMware SVGA II Adapter" <<< ${gpu_type}; then
+    pacstrap /mnt xf86-video-vmware xf86-input-vmmouse
 fi
 
 
@@ -249,5 +275,5 @@ sed -i "s/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/ %wheel ALL=(ALL:ALL) NOPASSWD: A
 
 
 ### Install Desktop
-pacstrap /mnt xf86-video-vmware mesa lib32-mesa sddm sddm-kcm plasma-meta kde-applications-meta
+pacstrap /mnt sddm sddm-kcm plasma-meta kde-applications-meta
 arch-chroot /mnt systemctl enable sddm.service
