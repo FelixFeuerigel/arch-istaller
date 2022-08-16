@@ -257,7 +257,7 @@ elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
 elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
     pacstrap /mnt libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 elif grep -E "VMware SVGA II Adapter" <<< ${gpu_type}; then
-    pacstrap /mnt xf86-video-vmware xf86-input-vmmouse
+    pacstrap /mnt xf86-video-vmware xf86-input-vmmouse virtualbox-guest-utils virtualbox-guest-utils-nox
 fi
 
 
