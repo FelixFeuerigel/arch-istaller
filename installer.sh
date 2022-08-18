@@ -31,6 +31,9 @@ hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
 clear
 : ${hostname:?"hostname cannot be empty"}
 
+desktop=$(dialog --stdout --no-items --checklist "Enter hostname" 0 0 0 "Openbox" off "AwsomeWM" off "KDE" off "Custom" off) || exit 1
+clear
+
 user=$(dialog --stdout --inputbox "Enter admin username" 0 0 "felix_feuerigel") || exit 1
 clear
 : ${user:?"user cannot be empty"}
@@ -138,8 +141,7 @@ sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 
 ##### Start of Config for New System #####
 #### Install and configure the basic system ####
-# pacstrap /mnt mdaffin-desktop
-pacstrap /mnt base base-devel linux linux-firmware nano sudo networkmanager git alsa-ucm-conf sof-firmware alsa-ucm-conf
+pacstrap /mnt base base-devel linux linux-firmware nano sudo networkmanager alsa-ucm-conf sof-firmware alsa-ucm-conf
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
@@ -212,11 +214,11 @@ echo "KEYMAP=de-latin1" >> /mnt/etc/vconsole.conf
 PROC_TYPE=$(lscpu)
 if grep -E "GenuineIntel" <<< ${PROC_TYPE}; then
     echo "Installing Intel microcode"
-    pacstrap /mnt intel-ucode
+    pacstrap --needed /mnt intel-ucode
     PROC_UCODE="intel-ucode.img"
 elif grep -E "AuthenticAMD" <<< ${PROC_TYPE}; then
     echo "Installing AMD microcode"
-    pacstrap /mnt amd-ucode
+    pacstrap --needed /mnt amd-ucode
     PROC_UCODE="amd-ucode.img"
 fi
 
@@ -239,9 +241,8 @@ EOF
 fi
 
 ### installing GRUB for BIOS/MBR systems ###
-if [ "$BOOT_MODE" == "BIOS" ]
-  then
-    pacstrap /mnt grub
+if [ "$BOOT_MODE" == "BIOS" ]; then
+    pacstrap --needed /mnt grub
     arch-chroot /mnt grub-install --target=i386-pc "${device}"
     arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 fi
@@ -249,15 +250,15 @@ fi
 ### installting graphics drivers
 gpu_type=$(lspci)
 if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
-    pacstrap /mnt nvidia nvidia-xconfig nvidia-utils lib32-nvidia-utils
+    pacstrap --needed /mnt nvidia nvidia-xconfig nvidia-utils lib32-nvidia-utils
 elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
-    pacstrap /mnt xf86-video-amdgpu lib32-mesa
+    pacstrap --needed /mnt xf86-video-amdgpu lib32-mesa
 elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
-    pacstrap /mnt libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
+    pacstrap --needed /mnt libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
-    pacstrap /mnt libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
+    pacstrap --needed /mnt libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 elif grep -E "VMware SVGA II Adapter" <<< ${gpu_type}; then
-    pacstrap /mnt xf86-video-vmware xf86-input-vmmouse virtualbox-guest-utils virtualbox-guest-utils-nox
+    pacstrap --needed /mnt xf86-video-vmware xf86-input-vmmouse virtualbox-guest-utils virtualbox-guest-utils-nox
 fi
 
 
@@ -273,5 +274,19 @@ sed -i "s/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/ %wheel ALL=(ALL:ALL) NOPASSWD: A
 
 
 ### Install Desktop
-pacstrap /mnt sddm sddm-kcm plasma-meta kde-applications-meta
-arch-chroot /mnt systemctl enable sddm.service
+if [[ "$desktop" =~ "AwsomeWM" ]]; then
+    pacstrap --needed /mnt sddm awesome git nvim alacritty fish 
+    arch-chroot /mnt systemctl enable sddm.service
+
+elif [[ "$desktop" =~ "Openbox" ]]; then
+    pacstrap --needed /mnt sddm openbox git nvim alacritty fish 
+    arch-chroot /mnt systemctl enable sddm.service
+
+elif [[ "$desktop" =~ "KDE" ]]; then
+    pacstrap --needed /mnt sddm sddm-kcm plasma-meta kde-applications-meta git
+    arch-chroot /mnt systemctl enable sddm.service
+
+elif [[ "$desktop" =~ "Custom" ]]; then
+    pacstrap --needed /mnt mdaffin-desktop
+    
+fi
