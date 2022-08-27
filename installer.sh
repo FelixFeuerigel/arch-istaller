@@ -31,7 +31,7 @@ hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
 clear
 : ${hostname:?"hostname cannot be empty"}
 
-desktop=$(dialog --stdout --no-items --checklist "Enter hostname" 0 0 0 "Openbox" off "AwsomeWM" off "KDE" off "Custom" off) || exit 1
+desktop=$(dialog --stdout --no-items --checklist "Enter hostname" 0 0 0 "AwsomeWM" off "Openbox" off "KDE" off "Custom" off) || exit 1
 clear
 
 user=$(dialog --stdout --inputbox "Enter admin username" 0 0 "felix") || exit 1
@@ -276,16 +276,16 @@ sed -i "s/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/ %wheel ALL=(ALL:ALL) NOPASSWD: A
 
 ### Install Desktop
 if [[ "$desktop" =~ "AwsomeWM" ]]; then ## missing programs for notifications
-    pacstrap /mnt sddm awesome nitrogen dmenu rofi pcmanfm nvim nano gedit lxappearance xterm alacritty fish git picom lxsession polkit \
-    pipewire lib32-pipewire pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack wireplumber \ #audio
-    bluez bluez-utils blueman #bluetooth
+    pacstrap /mnt sddm awesome nitrogen dmenu rofi pcmanfm neovim nano gedit lxappearance xterm alacritty fish git picom lxsession polkit \
+    pipewire lib32-pipewire pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack wireplumber \
+    bluez bluez-utils blueman
 
     ## parts of the audio programs might not start automatically
     arch-chroot /mnt systemctl enable sddm.service
     arch-chroot /mnt systemctl enable bluetooth.service
 
 elif [[ "$desktop" =~ "Openbox" ]]; then
-    pacstrap /mnt sddm openbox obconf git nvim alacritty fish nano
+    pacstrap /mnt sddm openbox obconf git neovim alacritty fish nano
     arch-chroot /mnt systemctl enable sddm.service
 
 elif [[ "$desktop" =~ "KDE" ]]; then
