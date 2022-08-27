@@ -276,7 +276,7 @@ sed -i "s/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/ %wheel ALL=(ALL:ALL) NOPASSWD: A
 
 ### Install Desktop
 if [[ "$desktop" =~ "AwsomeWM" ]]; then ## missing programs for notifications
-    pacstrap /mnt sddm awesome nitrogen dmenu rofi pcmanfm neovim nano gedit lxappearance xterm alacritty fish git picom lxsession polkit \
+    pacstrap /mnt sddm awesome nitrogen dmenu rofi pcmanfm neovim nano gedit lxappearance xterm alacritty fish git firefox picom lxsession polkit \
     pipewire lib32-pipewire pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack wireplumber \
     bluez bluez-utils blueman
 
