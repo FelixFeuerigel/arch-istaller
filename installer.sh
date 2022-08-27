@@ -22,7 +22,7 @@ exec 2> >(tee "stderr.log")
 timedatectl set-ntp true
 loadkeys de-latin1
 
-pacman -Sy --noconfirm --needed archlinux-keyring
+pacman -Sy --noconfirm archlinux-keyring
 pacman -S --noconfirm --needed reflector dialog
 
 
@@ -34,7 +34,7 @@ clear
 desktop=$(dialog --stdout --no-items --checklist "Enter hostname" 0 0 0 "Openbox" off "AwsomeWM" off "KDE" off "Custom" off) || exit 1
 clear
 
-user=$(dialog --stdout --inputbox "Enter admin username" 0 0 "Felix") || exit 1
+user=$(dialog --stdout --inputbox "Enter admin username" 0 0 "felix") || exit 1
 clear
 : ${user:?"user cannot be empty"}
 
@@ -264,7 +264,7 @@ fi
 
 
 ### adding the user ###
-arch-chroot /mnt useradd -m -G wheel "$user"
+arch-chroot /mnt useradd -m --badname -G wheel "$user"
 
 echo "$user:$password" | chpasswd --root /mnt
 echo "root:$password" | chpasswd --root /mnt
