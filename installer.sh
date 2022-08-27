@@ -34,7 +34,7 @@ clear
 desktop=$(dialog --stdout --no-items --checklist "Enter hostname" 0 0 0 "Openbox" off "AwsomeWM" off "KDE" off "Custom" off) || exit 1
 clear
 
-user=$(dialog --stdout --inputbox "Enter admin username" 0 0 "felix_feuerigel") || exit 1
+user=$(dialog --stdout --inputbox "Enter admin username" 0 0 "Felix") || exit 1
 clear
 : ${user:?"user cannot be empty"}
 
@@ -141,7 +141,7 @@ sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 
 ##### Start of Config for New System #####
 #### Install and configure the basic system ####
-pacstrap /mnt base base-devel linux linux-firmware nano sudo networkmanager alsa-ucm-conf sof-firmware alsa-ucm-conf
+pacstrap /mnt base base-devel linux linux-firmware sudo networkmanager alsa-ucm-conf sof-firmware alsa-ucm-conf
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
@@ -274,19 +274,24 @@ sed -i "s/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/ %wheel ALL=(ALL:ALL) NOPASSWD: A
 
 
 ### Install Desktop
-if [[ "$desktop" =~ "AwsomeWM" ]]; then
-    pacstrap --needed /mnt sddm awesome git nvim alacritty fish 
+if [[ "$desktop" =~ "AwsomeWM" ]]; then ## missing programs for notifications
+    pacstrap --needed /mnt sddm awesome nitrogen dmenu rofi pcmanfm nvim nano gedit lxappearance xterm alacritty fish git picom lxsession polkit \
+    pipewire lib32-pipewire pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack wireplumber \ #audio
+    bluez bluez-utils blueman #bluetooth
+
+    ## parts of the audio programs might not start automatically
     arch-chroot /mnt systemctl enable sddm.service
+    arch-chroot /mnt systemctl enable bluetooth.service
 
 elif [[ "$desktop" =~ "Openbox" ]]; then
-    pacstrap --needed /mnt sddm openbox git nvim alacritty fish 
+    pacstrap --needed /mnt sddm openbox obconf git nvim alacritty fish nano
     arch-chroot /mnt systemctl enable sddm.service
 
 elif [[ "$desktop" =~ "KDE" ]]; then
-    pacstrap --needed /mnt sddm sddm-kcm plasma-meta kde-applications-meta git
+    pacstrap --needed /mnt sddm sddm-kcm plasma-meta kde-applications-meta git nano
     arch-chroot /mnt systemctl enable sddm.service
 
 elif [[ "$desktop" =~ "Custom" ]]; then
-    pacstrap --needed /mnt mdaffin-desktop
+    pacstrap --needed /mnt fefe-desktop
     
 fi
