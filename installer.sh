@@ -22,7 +22,7 @@ exec 2> >(tee "stderr.log")
 timedatectl set-ntp true
 loadkeys de-latin1
 
-pacman -Sy archlinux-keyring --noconfirm
+pacman -Sy --noconfirm --needed archlinux-keyring
 pacman -S --noconfirm --needed reflector dialog
 
 
@@ -50,6 +50,7 @@ device=$(dialog --stdout --menu "Select installtion disk" 0 0 0 ${devicelist}) |
 clear
 
 ### set up pacman ###
+echo "Searching for pacman mirrors"
 reflector -a 48 -f 25 -l 30 -n 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 
@@ -258,7 +259,7 @@ elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
 elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
     pacstrap /mnt libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 elif grep -E "VMware SVGA II Adapter" <<< ${gpu_type}; then
-    pacstrap /mnt xf86-video-vmware xf86-input-vmmouse virtualbox-guest-utils virtualbox-guest-utils-nox
+    pacstrap /mnt xf86-video-vmware xf86-input-vmmouse virtualbox-guest-utils
 fi
 
 
