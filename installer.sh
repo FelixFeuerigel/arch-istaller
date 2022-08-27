@@ -214,11 +214,11 @@ echo "KEYMAP=de-latin1" >> /mnt/etc/vconsole.conf
 PROC_TYPE=$(lscpu)
 if grep -E "GenuineIntel" <<< ${PROC_TYPE}; then
     echo "Installing Intel microcode"
-    pacstrap --needed /mnt intel-ucode
+    pacstrap /mnt intel-ucode
     PROC_UCODE="intel-ucode.img"
 elif grep -E "AuthenticAMD" <<< ${PROC_TYPE}; then
     echo "Installing AMD microcode"
-    pacstrap --needed /mnt amd-ucode
+    pacstrap /mnt amd-ucode
     PROC_UCODE="amd-ucode.img"
 fi
 
@@ -242,7 +242,7 @@ fi
 
 ### installing GRUB for BIOS/MBR systems ###
 if [ "$BOOT_MODE" == "BIOS" ]; then
-    pacstrap --needed /mnt grub
+    pacstrap /mnt grub
     arch-chroot /mnt grub-install --target=i386-pc "${device}"
     arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 fi
@@ -250,15 +250,15 @@ fi
 ### installting graphics drivers
 gpu_type=$(lspci)
 if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
-    pacstrap --needed /mnt nvidia nvidia-xconfig nvidia-utils lib32-nvidia-utils
+    pacstrap /mnt nvidia nvidia-xconfig nvidia-utils lib32-nvidia-utils
 elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
-    pacstrap --needed /mnt xf86-video-amdgpu lib32-mesa
+    pacstrap /mnt xf86-video-amdgpu lib32-mesa
 elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
-    pacstrap --needed /mnt libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
+    pacstrap /mnt libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
-    pacstrap --needed /mnt libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
+    pacstrap /mnt libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 elif grep -E "VMware SVGA II Adapter" <<< ${gpu_type}; then
-    pacstrap --needed /mnt xf86-video-vmware xf86-input-vmmouse virtualbox-guest-utils virtualbox-guest-utils-nox
+    pacstrap /mnt xf86-video-vmware xf86-input-vmmouse virtualbox-guest-utils virtualbox-guest-utils-nox
 fi
 
 
@@ -275,7 +275,7 @@ sed -i "s/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/ %wheel ALL=(ALL:ALL) NOPASSWD: A
 
 ### Install Desktop
 if [[ "$desktop" =~ "AwsomeWM" ]]; then ## missing programs for notifications
-    pacstrap --needed /mnt sddm awesome nitrogen dmenu rofi pcmanfm nvim nano gedit lxappearance xterm alacritty fish git picom lxsession polkit \
+    pacstrap /mnt sddm awesome nitrogen dmenu rofi pcmanfm nvim nano gedit lxappearance xterm alacritty fish git picom lxsession polkit \
     pipewire lib32-pipewire pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack wireplumber \ #audio
     bluez bluez-utils blueman #bluetooth
 
@@ -284,14 +284,14 @@ if [[ "$desktop" =~ "AwsomeWM" ]]; then ## missing programs for notifications
     arch-chroot /mnt systemctl enable bluetooth.service
 
 elif [[ "$desktop" =~ "Openbox" ]]; then
-    pacstrap --needed /mnt sddm openbox obconf git nvim alacritty fish nano
+    pacstrap /mnt sddm openbox obconf git nvim alacritty fish nano
     arch-chroot /mnt systemctl enable sddm.service
 
 elif [[ "$desktop" =~ "KDE" ]]; then
-    pacstrap --needed /mnt sddm sddm-kcm plasma-meta kde-applications-meta git nano
+    pacstrap /mnt sddm sddm-kcm plasma-meta kde-applications-meta git nano
     arch-chroot /mnt systemctl enable sddm.service
 
 elif [[ "$desktop" =~ "Custom" ]]; then
-    pacstrap --needed /mnt fefe-desktop
+    pacstrap /mnt fefe-desktop
     
 fi
