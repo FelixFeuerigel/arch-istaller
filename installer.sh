@@ -227,6 +227,9 @@ fi
 if [ "$BOOT_MODE" == "EFI" ]
 then
 arch-chroot /mnt bootctl --path=/boot install
+#todo: add the missing pacman hook for automaticaly updating the bootloader
+#todo: add fallback bootloader entry (initramfs-linux-fallback.img)
+#todo: auto install an efi shell for x64 devices
 
 cat << EOF > /mnt/boot/loader/loader.conf
 default arch
