@@ -283,16 +283,21 @@ if [[ "$desktop" =~ "AwsomeWM" ]]; then ## missing programs for notifications
     ## parts of the audio programs might not start automatically
     arch-chroot /mnt systemctl enable sddm.service
     arch-chroot /mnt systemctl enable bluetooth.service
+fi
 
-elif [[ "$desktop" =~ "Openbox" ]]; then
-    pacstrap /mnt sddm openbox obconf git neovim alacritty fish nano
+if [[ "$desktop" =~ "Openbox" ]]; then
+    pacstrap /mnt sddm sddm-kcm openbox obconf git neovim alacritty fish nano
     arch-chroot /mnt systemctl enable sddm.service
+fi
 
-elif [[ "$desktop" =~ "KDE" ]]; then
+if [[ "$desktop" =~ "KDE" ]]; then
     pacstrap /mnt sddm sddm-kcm plasma-meta kde-applications-meta git nano
     arch-chroot /mnt systemctl enable sddm.service
+fi
 
-elif [[ "$desktop" =~ "Custom" ]]; then
+if [[ "$desktop" =~ "Custom" ]]; then
     pacstrap /mnt fefe-desktop
     
 fi
+
+arch-chroot /mnt localectl --no-convert set-x11-keymap de
