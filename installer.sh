@@ -232,7 +232,8 @@ arch-chroot /mnt bootctl --path=/boot install
 #todo: auto install an efi shell
 
 cat << EOF > /mnt/boot/loader/loader.conf
-default arch
+default @saved
+timeout 0
 EOF
 
 cat << EOF > /mnt/boot/loader/entries/arch.conf
@@ -278,7 +279,7 @@ sed -i "s/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/ %wheel ALL=(ALL:ALL) NOPASSWD: A
 
 
 ### Install Desktop
-if [[ "$desktop" =~ "AwsomeWM" ]]; then ##todo: missing programs for notifications and cups server for printing
+if [[ "$desktop" =~ "AwsomeWM" ]]; then ##todo: missing programs for notifications, auto USB mounting and cups server for printing
     pacstrap /mnt sddm awesome nitrogen dmenu rofi neovim nano lxappearance xterm alacritty fish picom lxsession polkit \
     htop git man \
     keepassxc firefox gedit\
@@ -307,3 +308,4 @@ if [[ "$desktop" =~ "Custom" ]]; then
 fi
 
 arch-chroot /mnt localectl --no-convert set-x11-keymap de
+#todo: change the dafault shell of alacritty to fish
