@@ -229,7 +229,7 @@ then
 arch-chroot /mnt bootctl --path=/boot install
 #todo: add the missing pacman hook for automaticaly updating the bootloader
 #todo: add fallback bootloader entry (initramfs-linux-fallback.img)
-#todo: auto install an efi shell for x64 devices
+#todo: auto install an efi shell
 
 cat << EOF > /mnt/boot/loader/loader.conf
 default arch
@@ -278,9 +278,12 @@ sed -i "s/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/ %wheel ALL=(ALL:ALL) NOPASSWD: A
 
 
 ### Install Desktop
-if [[ "$desktop" =~ "AwsomeWM" ]]; then ## missing programs for notifications
-    pacstrap /mnt sddm awesome nitrogen dmenu rofi pcmanfm neovim nano gedit lxappearance xterm alacritty fish git firefox picom lxsession polkit \
-    pipewire lib32-pipewire pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack wireplumber \
+if [[ "$desktop" =~ "AwsomeWM" ]]; then ##todo: missing programs for notifications and cups server for printing
+    pacstrap /mnt sddm awesome nitrogen dmenu rofi neovim nano lxappearance xterm alacritty fish picom lxsession polkit \
+    htop git man \
+    keepassxc firefox gedit\
+    pcmanfm gvfs-smb \
+    pipewire lib32-pipewire pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack wireplumber qpwgraph \
     bluez bluez-utils blueman
 
     ## parts of the audio programs might not start automatically
