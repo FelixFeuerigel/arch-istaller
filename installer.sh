@@ -309,5 +309,5 @@ if [[ "$desktop" =~ "Custom" ]]; then
     
 fi
 
-# arch-chroot /mnt localectl --no-convert set-x11-keymap #the command fails in a chroot environment
+# arch-chroot /mnt localectl --no-convert set-x11-keymap de #the command fails in a chroot environment
 #todo: change the dafault shell of alacritty to fish
