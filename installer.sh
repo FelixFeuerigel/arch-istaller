@@ -8,7 +8,7 @@
 #
 
 ### Custom Arch Repository ###
-REPO_URL="https://s3.eu-west-2.amazonaws.com/mdaffin-arch/repo/x86_64"
+REPO_URL="https://felixfeuerigel.github.io/arch-repo/x86_64/"
 
 
 ### Set up logging and error handling ###
@@ -129,11 +129,11 @@ if [ "$BOOT_MODE" == "BIOS" ]
 fi
 
 ### Add custom repo ###
-# cat >> /etc/pacman.conf << EOF
-# [mdaffin]
-# SigLevel = Optional TrustAll
-# Server = $REPO_URL
-# EOF
+cat >> /etc/pacman.conf << EOF
+[fefe]
+SigLevel = Optional TrustAll
+Server = $REPO_URL
+EOF
 
 ### enable multilib repo ###
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
@@ -148,11 +148,11 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 ### Edit the pacman.conf ###
 ## add own repo
-# cat >> /mnt/etc/pacman.conf << EOF
-# [mdaffin]
-# SigLevel = Optional TrustAll
-# Server = $REPO_URL
-# EOF
+cat >> /mnt/etc/pacman.conf << EOF
+[fefe]
+SigLevel = Optional TrustAll
+Server = $REPO_URL
+EOF
 
 ## enable multilib
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
@@ -227,15 +227,16 @@ fi
 if [ "$BOOT_MODE" == "EFI" ]
 then
 arch-chroot /mnt bootctl --path=/boot install
-#todo: add the missing pacman hook for automaticaly updating the bootloader
 #todo: add fallback bootloader entry (initramfs-linux-fallback.img)
 #todo: auto install an efi shell
 
+# configure the boot manager
 cat << EOF > /mnt/boot/loader/loader.conf
 default @saved
 timeout 0
 EOF
 
+# create arch boot entry
 cat << EOF > /mnt/boot/loader/entries/arch.conf
 title    Arch Linux
 linux    /vmlinuz-linux
@@ -243,6 +244,28 @@ initrd   /$PROC_UCODE
 initrd   /initramfs-linux.img
 options  root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
 EOF
+
+cat << EOF > /mnt/boot/loader/entries/arch-fallback.conf
+title   Arch Linux (fallback initramfs)
+linux   /vmlinuz-linux
+initrd  /$PROC_UCODE
+initrd  /initramfs-linux-fallback.img
+options root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
+EOF
+
+# create pacman hook for updating the boot manager
+cat << EOF > /mnt/etc/pacman.d/hooks/100-systemd-boot.hook
+[Trigger]
+Type = Package
+Operation = Upgrade
+Target = systemd
+
+[Action]
+Description = Gracefully upgrading systemd-boot...
+When = PostTransaction
+Exec = /usr/bin/systemctl restart systemd-boot-update.service
+EOF
+
 fi
 
 ### installing GRUB for BIOS/MBR systems ###
