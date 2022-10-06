@@ -2,7 +2,7 @@
 # WARNING: this script will destroy data on the selected disk.
 #
 # This script can be run by executing the following:
-# ### curl -sL https://bit.ly/3aSie4S | bash ###
+# ### curl -sL bit.ly/3aSie4S | bash ###
 #
 # ## if you need to use WiFi use "iwctl" for setup  ##
 #
@@ -130,7 +130,7 @@ fi
 
 ### Add custom repo ###
 cat >> /etc/pacman.conf << EOF
-[fefe]
+[fefe-repo]
 SigLevel = Optional TrustAll
 Server = $REPO_URL
 EOF
@@ -146,10 +146,10 @@ pacstrap /mnt base base-devel linux linux-firmware sudo networkmanager alsa-ucm-
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
-### Edit the pacman.conf ###
+### Edit pacman.conf ###
 ## add own repo
 cat >> /mnt/etc/pacman.conf << EOF
-[fefe]
+[fefe-repo]
 SigLevel = Optional TrustAll
 Server = $REPO_URL
 EOF
