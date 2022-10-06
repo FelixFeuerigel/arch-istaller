@@ -9,6 +9,7 @@
 
 ### Custom Arch Repository ###
 REPO_URL="https://felixfeuerigel.github.io/arch-repo/x86_64/"
+REPO_NAME="fefe-repo"
 
 
 ### Set up logging and error handling ###
@@ -51,7 +52,7 @@ clear
 
 ### set up pacman ###
 echo "Searching for pacman mirrors"
-reflector -a 48 -f 25 -l 30 -n 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+reflector -a 48 -f 30 -l 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 
 
@@ -130,7 +131,8 @@ fi
 
 ### Add custom repo ###
 cat >> /etc/pacman.conf << EOF
-[fefe-repo]
+
+[$REPO_NAME]
 SigLevel = Optional TrustAll
 Server = $REPO_URL
 EOF
@@ -149,7 +151,8 @@ genfstab -U /mnt >> /mnt/etc/fstab
 ### Edit pacman.conf ###
 ## add own repo
 cat >> /mnt/etc/pacman.conf << EOF
-[fefe-repo]
+
+[$REPO_NAME]
 SigLevel = Optional TrustAll
 Server = $REPO_URL
 EOF
