@@ -335,9 +335,12 @@ if [[ "$desktop" =~ "KDE" ]]; then
 fi
 
 if [[ "$desktop" =~ "Custom" ]]; then
-    pacstrap /mnt fefe-desktop
-    
+    pacstrap /mnt fefe-desktop 
 fi
+
+echo "##########################"
+echo "# installation finished! #"
+echo "##########################"
 
 # arch-chroot /mnt localectl --no-convert set-x11-keymap de #the command fails in a chroot environment
 #todo: change the dafault shell of alacritty to fish
