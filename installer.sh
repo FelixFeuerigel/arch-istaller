@@ -257,6 +257,10 @@ options root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
 EOF
 
 # create pacman hook for updating the boot manager
+if [[ ! -d /mnt/etc/pacman.d/hooks ]]; then
+    mkdir /mnt/etc/pacman.d/hooks
+fi
+
 cat << EOF > /mnt/etc/pacman.d/hooks/100-systemd-boot.hook
 [Trigger]
 Type = Package
