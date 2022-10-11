@@ -2,7 +2,7 @@
 # WARNING: this script will destroy data on the selected disk.
 #
 # This script can be run by executing the following:
-# ### curl -sL ------ | bash ###
+# ### curl -sL https://bit.ly/3Mm4iP8 | bash ###
 #
 # ## if you need to use WiFi use "iwctl" for setup  ##
 #
