@@ -150,7 +150,7 @@ fi
 
 ##### Start of Config for New System #####
 #### Install and configure the basic system ####
-pacstrap /mnt fefe-awsome
+pacstrap /mnt fefe-awesome
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
