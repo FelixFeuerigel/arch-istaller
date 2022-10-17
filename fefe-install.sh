@@ -53,7 +53,7 @@ get_user_info
 ### set up pacman ###
 set_up_pacman () {
     echo "Searching for pacman mirrors"
-    reflector -a 48 -f 30 -l 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+    reflector -a 48 -f 20 -l 30 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 
     sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
     
