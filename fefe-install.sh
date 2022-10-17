@@ -157,30 +157,10 @@ pacstrap /mnt fefe-awsome
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
-### Edit pacman.conf ###
-## add own repo
-cat >> /mnt/etc/pacman.conf << EOF
-
-[$REPO_NAME]
-SigLevel = Optional TrustAll
-Server = $REPO_URL
-EOF
-
-## enable multilib
-sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
-
-## enable parallel downloads
-sed -i 's/^#ParallelDownloads/ParallelDownloads/' /mnt/etc/pacman.conf
-
-## enable pacman colors
-sed -i 's/^#Color/Color/' /mnt/etc/pacman.conf
-
-
 ### network setup ###
 echo "${hostname}" > /mnt/etc/hostname
 
-### seting the timezone and calibrating the hardware clock ###
-arch-chroot /mnt ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+### calibrating the hardware clock timezone is set by the fefe-base package ###
 arch-chroot /mnt hwclock --systohc
 
 
@@ -198,8 +178,7 @@ fi
 
 
 ### installing the boot loader for GPT/UEFI ###
-if [ "$BOOT_MODE" == "EFI" ]
-then
+if [ "$BOOT_MODE" == "EFI" ]; then
 arch-chroot /mnt bootctl --path=/boot install
 #todo: add fallback bootloader entry (initramfs-linux-fallback.img)
 #todo: auto install an efi shell
@@ -302,5 +281,4 @@ echo "##########################"
 echo "# installation finished! #"
 echo "##########################"
 
-# arch-chroot /mnt localectl --no-convert set-x11-keymap de #the command fails in a chroot environment
 #todo: change the dafault shell of alacritty to fish
