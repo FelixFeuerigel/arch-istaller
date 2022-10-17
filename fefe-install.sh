@@ -33,9 +33,6 @@ get_user_info () {
     clear
     : ${hostname:?"hostname cannot be empty"}
 
-    desktop=$(dialog --stdout --no-items --checklist "Chose Desktop" 0 0 0 "AwsomeWM" off "Openbox" off "KDE" off "Custom" off) || exit 1
-    clear
-
     user=$(dialog --stdout --inputbox "Enter admin username" 0 0 "felix") || exit 1
     clear
     : ${user:?"user cannot be empty"}
@@ -164,7 +161,7 @@ echo "${hostname}" > /mnt/etc/hostname
 arch-chroot /mnt hwclock --systohc
 
 
-### determine processor type and install microcode
+### determine processor type and install corresponding microcode
 PROC_TYPE=$(lscpu)
 if grep -E "GenuineIntel" <<< ${PROC_TYPE}; then
     echo "Installing Intel microcode"
@@ -180,8 +177,6 @@ fi
 ### installing the boot loader for GPT/UEFI ###
 if [ "$BOOT_MODE" == "EFI" ]; then
 arch-chroot /mnt bootctl --path=/boot install
-#todo: add fallback bootloader entry (initramfs-linux-fallback.img)
-#todo: auto install an efi shell
 
 # configure the boot manager
 cat << EOF > /mnt/boot/loader/loader.conf
@@ -260,25 +255,6 @@ echo "root:$password" | chpasswd --root /mnt
 sed -i "s/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/ %wheel ALL=(ALL:ALL) NOPASSWD: ALL/" /mnt/etc/sudoers
 
 
-### Install Desktop
-if [[ "$desktop" =~ "AwsomeWM" ]]; then
-
-fi
-
-if [[ "$desktop" =~ "Openbox" ]]; then
-
-fi
-
-if [[ "$desktop" =~ "KDE" ]]; then
-
-fi
-
-if [[ "$desktop" =~ "Custom" ]]; then
-
-fi
-
 echo "##########################"
 echo "# installation finished! #"
 echo "##########################"
-
-#todo: change the dafault shell of alacritty to fish
