@@ -251,10 +251,6 @@ echo "$user:$password" | chpasswd --root /mnt
 echo "root:$password" | chpasswd --root /mnt
 
 
-## enableing sudo for the wheel group
-sed -i "s/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/ %wheel ALL=(ALL:ALL) NOPASSWD: ALL/" /mnt/etc/sudoers
-
-
 echo "##########################"
 echo "# installation finished! #"
 echo "##########################"
