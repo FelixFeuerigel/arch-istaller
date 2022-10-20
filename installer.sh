@@ -285,7 +285,7 @@ fi
 ### installting graphics drivers
 gpu_type=$(lspci)
 if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
-    pacstrap /mnt nvidia nvidia-xconfig nvidia-utils lib32-nvidia-utils
+    pacstrap /mnt nvidia nvidia-settings nvidia-xconfig lib32-nvidia-utils
 elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
     pacstrap /mnt xf86-video-amdgpu lib32-mesa
 elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
