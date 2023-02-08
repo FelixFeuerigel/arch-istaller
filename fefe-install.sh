@@ -233,8 +233,10 @@ fi
 gpu_type=$(lspci)
 if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
     pacstrap /mnt nvidia nvidia-xconfig nvidia-settings lib32-nvidia-utils
+    #for Laptops: https://wiki.archlinux.org/title/NVIDIA_Optimus
 elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
-    pacstrap /mnt xf86-video-amdgpu lib32-mesa
+    # https://wiki.archlinux.org/title/AMDGPU
+    pacstrap /mnt xf86-video-amdgpu lib32-vulkan-radeon mesa lib32-mesa
 elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
     pacstrap /mnt libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
@@ -250,6 +252,8 @@ arch-chroot /mnt useradd -m --badname -G wheel "$user"
 echo "$user:$password" | chpasswd --root /mnt
 echo "root:$password" | chpasswd --root /mnt
 
+### allows noticing any "busy" partitions, and finding the cause with "fuser"
+umount -R /mnt
 
 echo "##########################"
 echo "# installation finished! #"
