@@ -232,7 +232,7 @@ fi
 ### installting graphics drivers
 gpu_type=$(lspci)
 if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
-    pacstrap /mnt nvidia nvidia-xconfig nvidia-settings lib32-nvidia-utils
+    pacstrap /mnt nvidia nvidia-settings lib32-nvidia-utils
     #for Laptops: https://wiki.archlinux.org/title/NVIDIA_Optimus
 elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
     # https://wiki.archlinux.org/title/AMDGPU
